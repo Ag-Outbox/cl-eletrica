@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Distribuição elétrica animada</title>
+    <style>
+      * { box-sizing: border-box; }
+      body { margin: 0; min-height: 100vh; display: grid; place-items: center; padding: 32px; background: #e8edf3; font-family: Inter, ui-sans-serif, system-ui, sans-serif; color: #0f172a; }
+      .scene { position: relative; width: min(1040px, 100%); height: 650px; overflow: hidden; border: 1px solid #d8e0e9; border-radius: 32px; background: radial-gradient(circle at center, #ecfeff 0%, #f8fafc 44%, #eef2f7 100%); box-shadow: 0 28px 80px rgba(15, 23, 42, .16); }
+      .scene::before { content: ""; position: absolute; inset: 0; background-image: linear-gradient(to right, rgba(148,163,184,.11) 1px, transparent 1px), linear-gradient(to bottom, rgba(148,163,184,.11) 1px, transparent 1px); background-size: 28px 28px; }
+      .beams { position: absolute; inset: 0; z-index: 1; width: 100%; height: 100%; }
+      .base { fill: none; stroke: #94a3b8; stroke-width: 2; opacity: .22; }
+      .energy { fill: none; stroke-width: 3; stroke-linecap: round; stroke-dasharray: 70 430; animation: flow 5.4s linear infinite; }
+      .delay-1 { animation-delay: -.7s; } .delay-2 { animation-delay: -1.6s; } .delay-3 { animation-delay: -2.6s; }
+      @keyframes flow { to { stroke-dashoffset: -500; } }
+      .node { position: absolute; z-index: 2; display: flex; align-items: center; gap: 13px; width: 190px; min-height: 80px; padding: 14px; border: 1px solid rgba(203,213,225,.9); border-radius: 20px; background: rgba(255,255,255,.96); box-shadow: 0 18px 40px -24px rgba(15,23,42,.45); }
+      .node .icon { display: grid; flex: 0 0 auto; place-items: center; width: 50px; height: 50px; border-radius: 14px; }
+      .node svg { width: 34px; height: 34px; fill: none; stroke: currentColor; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
+      .node strong { display: block; font-size: 14px; line-height: 1.2; }
+      .node small { display: block; margin-top: 5px; color: #64748b; font-size: 11px; }
+      .lighting { left: 65px; top: 75px; } .lighting .icon { color: #d97706; background: #fffbeb; box-shadow: inset 0 0 0 1px #fde68a; }
+      .computers { right: 65px; top: 75px; } .computers .icon { color: #2563eb; background: #eff6ff; box-shadow: inset 0 0 0 1px #bfdbfe; }
+      .machine { left: 65px; bottom: 75px; } .machine .icon { color: #ea580c; background: #fff7ed; box-shadow: inset 0 0 0 1px #fed7aa; }
+      .pump { right: 65px; bottom: 75px; width: 205px; } .pump .icon { color: #dc2626; background: #fef2f2; box-shadow: inset 0 0 0 1px #fecaca; }
+      .panel { position: absolute; z-index: 3; left: 50%; top: 50%; display: flex; width: 184px; height: 184px; transform: translate(-50%,-50%); flex-direction: column; align-items: center; justify-content: center; border: 1px solid #a5f3fc; border-radius: 30px; background: #fff; box-shadow: 0 28px 75px -23px rgba(8,145,178,.68), 0 0 0 9px rgba(236,254,255,.9); }
+      .panel .tag { position: absolute; top: -15px; padding: 7px 14px; border: 1px solid #a5f3fc; border-radius: 999px; background: #fff; color: #0e7490; font-size: 10px; font-weight: 800; letter-spacing: .16em; text-transform: uppercase; box-shadow: 0 3px 10px rgba(15,23,42,.08); }
+      .panel .cabinet { width: 92px; height: 92px; }
+      .panel strong { margin-top: 2px; font-size: 14px; }
+      .status { display: flex; align-items: center; gap: 6px; margin-top: 8px; color: #16a34a; font-size: 9px; font-weight: 700; letter-spacing: .09em; text-transform: uppercase; }
+      .dot { width: 7px; height: 7px; border-radius: 50%; background: #22c55e; box-shadow: 0 0 10px #22c55e; }
+      @media (max-width: 760px) { body { padding: 12px; } .scene { height: 600px; } .node { width: 145px; padding: 10px; } .node .icon { width: 40px; height: 40px; } .node small { display: none; } .lighting,.machine { left: 18px; } .computers,.pump { right: 18px; } .pump { width: 160px; } .panel { width: 145px; height: 160px; } }
+    </style>
+  </head>
+  <body>
+    <main class="scene">
+      <svg class="beams" viewBox="0 0 1040 650" preserveAspectRatio="none" aria-hidden="true">
+        <defs>
+          <linearGradient id="amber" x1="520" y1="325" x2="160" y2="115" gradientUnits="userSpaceOnUse"><stop stop-color="#06b6d4"/><stop offset="1" stop-color="#f59e0b"/></linearGradient>
+          <linearGradient id="blue" x1="520" y1="325" x2="880" y2="115" gradientUnits="userSpaceOnUse"><stop stop-color="#06b6d4"/><stop offset="1" stop-color="#3b82f6"/></linearGradient>
+          <linearGradient id="orange" x1="520" y1="325" x2="160" y2="535" gradientUnits="userSpaceOnUse"><stop stop-color="#06b6d4"/><stop offset="1" stop-color="#f97316"/></linearGradient>
+          <linearGradient id="red" x1="520" y1="325" x2="880" y2="535" gradientUnits="userSpaceOnUse"><stop stop-color="#06b6d4"/><stop offset="1" stop-color="#ef4444"/></linearGradient>
+        </defs>
+        <path class="base" d="M520 325 Q340 198 160 115"/><path class="energy" stroke="url(#amber)" d="M520 325 Q340 198 160 115"/>
+        <path class="base" d="M520 325 Q700 198 880 115"/><path class="energy delay-1" stroke="url(#blue)" d="M520 325 Q700 198 880 115"/>
+        <path class="base" d="M520 325 Q340 452 160 535"/><path class="energy delay-2" stroke="url(#orange)" d="M520 325 Q340 452 160 535"/>
+        <path class="base" d="M520 325 Q700 452 880 535"/><path class="energy delay-3" stroke="url(#red)" d="M520 325 Q700 452 880 535"/>
+      </svg>
+
+      <article class="node lighting"><div class="icon"><svg viewBox="0 0 48 48"><path d="M10 10h28M24 10v7M15 27a9 9 0 0 1 18 0H15Zm-1 6-3 3m13-3v5m10-5 3 3"/></svg></div><div><strong>Iluminação</strong><small>Circuito de luz</small></div></article>
+      <article class="node computers"><div class="icon"><svg viewBox="0 0 48 48"><rect x="6" y="10" width="25" height="19" rx="3"/><path d="M14 36h20M18 29v7"/><rect x="28" y="18" width="14" height="18" rx="2.5"/><circle cx="35" cy="31" r="1.3" fill="currentColor" stroke="none"/></svg></div><div><strong>Computadores</strong><small>Rede e tomadas</small></div></article>
+      <article class="node machine"><div class="icon"><svg viewBox="0 0 48 48"><path d="M8 38V20l9-5v7l10-7v7l12-7v23H8Z"/><path d="M15 38v-8h8v8M29 29h4M29 34h4"/><circle cx="17" cy="25" r="2" fill="currentColor" stroke="none"/></svg></div><div><strong>Máquina</strong><small>Carga industrial</small></div></article>
+      <article class="node pump"><div class="icon"><svg viewBox="0 0 48 48"><path d="M6 37h36M11 37V24h8"/><circle cx="27" cy="27" r="9"/><circle cx="27" cy="27" r="3"/><path d="M36 25h6v7h-7M18 21v-6h8v3M11 24H6v-5h5M29 7c0 3-3 4.2-3 7a4 4 0 0 0 8 0c0-2.8-2.1-4.6-5-7Z"/></svg></div><div><strong>Bomba de incêndio</strong><small>Sistema de combate</small></div></article>
+
+      <article class="panel"><div class="tag">Distribuição</div><svg class="cabinet" viewBox="0 0 96 96" fill="none" aria-hidden="true"><rect x="21.5" y="10.5" width="53" height="75" rx="4.5" stroke="#334155" stroke-width="3"/><path d="M22 30h52M48 31v54" stroke="#334155" stroke-width="3"/><rect x="29" y="18" width="30" height="5" rx="2.5" fill="#475569"/><circle cx="66" cy="20.5" r="3" fill="#22c55e"/><rect x="28" y="38" width="13" height="10" rx="2" stroke="#334155" stroke-width="2.5"/><rect x="28" y="54" width="13" height="10" rx="2" stroke="#334155" stroke-width="2.5"/><rect x="28" y="70" width="13" height="8" rx="2" stroke="#334155" stroke-width="2.5"/><path d="M56 39h10M56 45h10M56 55h10M56 61h10M56 71h10M56 77h10" stroke="#334155" stroke-width="3" stroke-linecap="round"/><path d="m51 4-7 12h7l-5 10 13-14h-7l5-8h-6Z" fill="#06b6d4" stroke="white" stroke-width="1.5"/></svg><strong>Quadro de energia</strong><div class="status"><span class="dot"></span>Energizado</div></article>
+    </main>
+  </body>
+</html>
